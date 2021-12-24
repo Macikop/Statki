@@ -2,16 +2,20 @@ from os import system, name
 from time import sleep
 import sys
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+def playsound():
+    system("start nave.wav")
+
+colors = {
+    "PURPLE" : '\033[95m',
+    "BLUE" : '\033[94m',
+    "CYAN" : '\033[96m',
+    "GREEN" : '\033[92m',
+    "YELLOW" : '\033[93m',
+    "RED" : '\033[91m',
+    "ENDC" : '\033[0m',
+    "BOLD" : '\033[1m',
+    "UNDERLINE" : '\033[4m'
+}
 
 def wait(time):
         animation = "|/-\\"
@@ -27,6 +31,12 @@ def clear():
         _ = system('cls')   #windows
     else:
         _ = system('clear') #linux
+
+def display(text, color = "ENDC", newline = True):
+    if newline == True:
+        print(f"{colors[color]}{text}{colors['ENDC']}")
+    else:
+        print(f"{colors[color]}{text}{colors['ENDC']}", end='')
 
 def lirterki(word):
     word = word.upper()

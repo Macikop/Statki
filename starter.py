@@ -1,4 +1,4 @@
-from baisc import clear, lirterki, bcolors, wait
+from baisc import clear, lirterki, wait
 
 class starter_page():
     
@@ -6,7 +6,7 @@ class starter_page():
         clear()
         lirterki("Statki")
         print("\n", "")
-        wait(10)
+        #wait(10)
         print("Ustawienie statków: ")
         print("1. Automatyczne")
         print("2. Ręczne")

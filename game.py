@@ -1,4 +1,5 @@
-from baisc import clear, lirterki, bcolors, wait
+from os import set_inheritable
+from baisc import clear, lirterki, colors, wait, display
 import sys
 import random
 
@@ -6,6 +7,12 @@ class board():
     size_x = 10
     size_y = 10
     
+    def __init__(self):
+        self.plansza = []
+        for x in range(self.size_y):
+            self.plansza.append([])
+            for y in range(self.size_x):
+                self.plansza[x].append([0])
 
     def print_board(self):
         for n in self.plansza:
@@ -13,7 +20,7 @@ class board():
 
     def display_board(self):
         water = '▓'
-        print("╔═════════════════════╗"+ bcolors.OKBLUE)
+        display("╔═════════════════════╗", "ENDC")
         for n in self.plansza:
             i = 0
             for u in n:
@@ -23,26 +30,20 @@ class board():
                     #s = str(u[0])
                     s = "■"
                 if i == 0:
-                    sys.stdout.write("║" + bcolors.OKBLUE)
+                    display("║", "ENDC" , False)
                 #for i in range(self.size_x):
                 if s != water:
-                    sys.stdout.write(water + bcolors.WARNING)
-                    sys.stdout.write(s + bcolors.OKBLUE)
+                    display(water, "BLUE", False)
+                    display(s, "YELLOW", False)
                 else:
-                    sys.stdout.write(water + bcolors.OKBLUE)
-                    sys.stdout.write(s + bcolors.OKBLUE)
+                    display(water,"BLUE", False)
+                    display(s, "BLUE" , False)
                 if i == self.size_x -1:
-                    sys.stdout.write(water + "║\n"+ bcolors.OKBLUE)
+                    display(water, "BLUE", False)
+                    display("║")
                 i = i + 1
         #print(pla)
-        print("╚═════════════════════╝"+ bcolors.OKBLUE)
-
-    def __init__(self):
-        self.plansza = []
-        for y in range(self.size_y):
-            self.plansza.append([])
-            for x in range(self.size_x):
-                self.plansza[y].append([0])
+        display("╚═════════════════════╝","ENDC")
 
     def place_ship(self, x, y, dir, length, ship_num):
         if dir == False:
@@ -54,13 +55,25 @@ class board():
                 for n in range(y, y+length):
                     self.plansza[n][x] = [ship_num]
 
-    def check_ship(x, y, dir, size):
-        n=1
+    def check_ships(self,x, y, dir = True, size = 1):
+        tile =[]
+        if dir == True:
+            for l in range(size):
+
+                tile.append(self.plansza[(y+l)][x]) 
+        else:
+            for l in range(size):
+                tile.append(self.plansza[y][(x+l)])
+        #print(tile)
+        for n in tile:
+            if n[0] != 0:
+                return True
+        return False
 
 class ship():
     size = 1        #sieze:         1 - 4
-    pos_x = 1       #position x:    1 - 10
-    pos_y = 1       #position y:    1 - 10
+    pos_x = 1       #position x:    0 - 9
+    pos_y = 1       #position y:    0 - 9
     dir = True      #direction:     True - vertical, False - horizontal
     damage = []     #damage:        [[True],[False]]
     status = True   #status:        True - alive, False - destroyed
@@ -88,10 +101,12 @@ class game():
 
     def __init__(self):
         #clear()
-        self.team_a_ships = self.fleet(self.number_of_ships)
-        self.team_b_ships = self.fleet(self.number_of_ships)
+        self.team_a_fleet = self.create_fleet(self.number_of_ships)
+        self.team_b_fleet = self.create_fleet(self.number_of_ships)
         self.plansza_a = board()
-        self.random_ship_placement()
+        self.random_ship_placement(self.plansza_a, self.team_a_fleet)
+        #self.plansza_a.print_board()
+        self.plansza_a.display_board()
         #self.plansza_a.print_board()
         #print("")
         #self.plansza_b = board()
@@ -100,53 +115,74 @@ class game():
         #clear()
         #self.plansza_a.print_board()
 
-    def fleet (self, n):
+    def create_fleet (self, n):
         returner = []
         for _ in range(n):
             returner.append(ship())
         return returner
 
-    def random_ship_placement(self):
+    def random_ship_placement(self, board_obj, fleet_obj):
         n = 0
+        miss = True
         for _ in range(self.frigate_num):
             size = 1
+            miss = True
             direction = bool(random.getrandbits(1))
-
-            if direction == False:
-                self.plansza_a.place_ship(random.randrange(0, (board.size_x + 1) - size), random.randrange(0,9), direction, size, n+1)
-            else:
-                self.plansza_a.place_ship(random.randrange(0, 9), random.randrange(0, (board.size_y + 1) - size), direction, size, n+1)
+            while miss == True:
+                if direction == False:
+                    x = random.randrange(0, (board.size_x+1) - size)
+                    y = random.randrange(0,9)
+                else:
+                    x = random.randrange(0, 9)
+                    y = random.randrange(0, (board.size_y+1) - size)
+                miss = board_obj.check_ships(x, y, direction, size)
+            board_obj.place_ship(x, y, direction, size, n+1)
+            fleet_obj[n].set_place(x, y, direction, size)
             n = n + 1
         
         for _ in range(self.destroyer_num):
+            miss = True
             size = 2
             direction = bool(random.getrandbits(1))
-
-            if direction == False:
-                self.plansza_a.place_ship(random.randrange(0, (board.size_x + 1) - size), random.randrange(0,9), direction, size, n+1)
-            else:
-                self.plansza_a.place_ship(random.randrange(0, 9), random.randrange(0, (board.size_y + 1) - size), direction, size, n+1)
+            while miss == True:
+                if direction == False:
+                    x = random.randrange(0, (board.size_x+1) - size)
+                    y = random.randrange(0,9)
+                else:
+                    x = random.randrange(0, 9)
+                    y = random.randrange(0, (board.size_y+1) - size)
+                miss = board_obj.check_ships(x, y, direction, size)
+            board_obj.place_ship(x, y, direction, size, n+1)
+            fleet_obj[n].set_place(x, y, direction, size)
             n = n + 1
 
         for _ in range(self.cruiser_num):
+            miss = True
             size = 3
             direction = bool(random.getrandbits(1))
-
-            if direction == False:
-                self.plansza_a.place_ship(random.randrange(0, (board.size_x + 1) - size), random.randrange(0,9), direction, size, n+1)
-            else:
-                self.plansza_a.place_ship(random.randrange(0, 9), random.randrange(0, (board.size_y + 1) - size), direction, size, n+1)
+            while miss == True:
+                if direction == False:
+                    x = random.randrange(0, (board.size_x+1) - size)
+                    y = random.randrange(0,9)
+                else:
+                    x = random.randrange(0, 9)
+                    y = random.randrange(0, (board.size_y+1) - size)
+                miss = board_obj.check_ships(x, y, direction, size)
+            board_obj.place_ship(x, y, direction, size, n+1)
+            fleet_obj[n].set_place(x, y, direction, size)
             n = n + 1
 
         for _ in range(self.battleship_num):
+            miss = True
             size = 4
             direction = bool(random.getrandbits(1))
-
-            if direction == False:
-                self.plansza_a.place_ship(random.randrange(0, (board.size_x + 1) - size), random.randrange(0,9), direction, size, n+1)
-            else:
-                self.plansza_a.place_ship(random.randrange(0, 9), random.randrange(0, (board.size_y + 1) - size), direction, size, n+1)
+            while miss == True:
+                if direction == False:
+                    x = random.randrange(0, (board.size_x+1) - size)
+                    y = random.randrange(0,9)
+                else:
+                    x = random.randrange(0, 9)
+                    y = random.randrange(0, (board.size_y+1) - size)
+                miss = board_obj.check_ships(x, y, direction, size)
+            board_obj.place_ship(x, y, direction, size, n+1)
             n = n + 1
-        
-        #self.plansza_a.print_board()
-        self.plansza_a.display_board()

@@ -1,6 +1,4 @@
-from os import set_inheritable
 from baisc import clear, lirterki, colors, wait, display
-import sys
 import random
 
 class board():
@@ -18,32 +16,40 @@ class board():
         for n in self.plansza:
             print(n)
 
-    def display_board(self):
-        water = '▓'
-        display("╔═════════════════════╗", "ENDC")
+    def display_board(self, fleet):
+        water = '▒'
+        display("╔═════════════════════╗", "WHITE")
         for n in self.plansza:
             i = 0
             for u in n:
-                if u[0] == 0:
-                    s = water
+                if u[0] != 0:
+                    tile = str(u[0])
+                    position = fleet[u[0]-1].dir
+                    #tile = "■"
                 else:
-                    #s = str(u[0])
-                    s = "■"
+                    tile = water
                 if i == 0:
-                    display("║", "ENDC" , False)
+                    display("║", "WHITE" , False)
                 #for i in range(self.size_x):
-                if s != water:
-                    display(water, "BLUE", False)
-                    display(s, "YELLOW", False)
+                if tile != water:
+                    if u[0] >= 1 and u[0] <= 4:
+                        display(water, "BLUE", False)
+                        display("■", "YELLOW", False)
+
+                    elif position == True:
+                        display(water, "BLUE", False)
+                        display("█", "YELLOW", False)
+                    else:
+                        display("▬▬", "YELLOW", False)
                 else:
                     display(water,"BLUE", False)
-                    display(s, "BLUE" , False)
+                    display(tile, "BLUE" , False)
                 if i == self.size_x -1:
                     display(water, "BLUE", False)
                     display("║")
                 i = i + 1
         #print(pla)
-        display("╚═════════════════════╝","ENDC")
+        display("╚═════════════════════╝","WHITE")
 
     def place_ship(self, x, y, dir, length, ship_num):
         if dir == False:
@@ -105,8 +111,8 @@ class game():
         self.team_b_fleet = self.create_fleet(self.number_of_ships)
         self.plansza_a = board()
         self.random_ship_placement(self.plansza_a, self.team_a_fleet)
-        #self.plansza_a.print_board()
-        self.plansza_a.display_board()
+        self.plansza_a.print_board()
+        self.plansza_a.display_board(self.team_a_fleet)
         #self.plansza_a.print_board()
         #print("")
         #self.plansza_b = board()
@@ -137,7 +143,7 @@ class game():
                     y = random.randrange(0, (board.size_y+1) - size)
                 miss = board_obj.check_ships(x, y, direction, size)
             board_obj.place_ship(x, y, direction, size, n+1)
-            fleet_obj[n].set_place(x, y, direction, size)
+            fleet_obj[n].set_place(x, y, size, direction)
             n = n + 1
         
         for _ in range(self.destroyer_num):
@@ -153,7 +159,7 @@ class game():
                     y = random.randrange(0, (board.size_y+1) - size)
                 miss = board_obj.check_ships(x, y, direction, size)
             board_obj.place_ship(x, y, direction, size, n+1)
-            fleet_obj[n].set_place(x, y, direction, size)
+            fleet_obj[n].set_place(x, y, size, direction)
             n = n + 1
 
         for _ in range(self.cruiser_num):
@@ -169,7 +175,7 @@ class game():
                     y = random.randrange(0, (board.size_y+1) - size)
                 miss = board_obj.check_ships(x, y, direction, size)
             board_obj.place_ship(x, y, direction, size, n+1)
-            fleet_obj[n].set_place(x, y, direction, size)
+            fleet_obj[n].set_place(x, y, size, direction)
             n = n + 1
 
         for _ in range(self.battleship_num):
@@ -185,4 +191,5 @@ class game():
                     y = random.randrange(0, (board.size_y+1) - size)
                 miss = board_obj.check_ships(x, y, direction, size)
             board_obj.place_ship(x, y, direction, size, n+1)
+            fleet_obj[n].set_place(x, y, size, direction)
             n = n + 1

@@ -1,6 +1,8 @@
 from os import system, name
 from time import sleep
 import sys
+import threading
+import winsound
 
 def playsound():
     system("start nave.wav")
@@ -12,7 +14,7 @@ colors = {
     "GREEN" : '\033[92m',
     "YELLOW" : '\033[93m',
     "RED" : '\033[91m',
-    "ENDC" : '\033[0m',
+    "WHITE" : '\033[0m',
     "BOLD" : '\033[1m',
     "UNDERLINE" : '\033[4m'
 }
@@ -32,11 +34,17 @@ def clear():
     else:
         _ = system('clear') #linux
 
-def display(text, color = "ENDC", newline = True):
-    if newline == True:
-        print(f"{colors[color]}{text}{colors['ENDC']}")
+def playsound(file):
+    if name == 'nt':
+        winsound.PlaySound(file, winsound.SND_FILENAME)
     else:
-        print(f"{colors[color]}{text}{colors['ENDC']}", end='')
+        system("play " + file)
+
+def display(text, color = "WHITE", newline = True):
+    if newline == True:
+        print(f"{colors[color]}{text}{colors['WHITE']}")
+    else:
+        print(f"{colors[color]}{text}{colors['WHITE']}", end='')
 
 def lirterki(word):
     word = word.upper()

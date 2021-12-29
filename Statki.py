@@ -5,14 +5,14 @@ import threading
 
 def radio():
     while True:
-        playsound("escape.wav")
         playsound("nave.wav")
-        
+        playsound("escape.wav")
+
 
 if __name__ == '__main__':
     #playsound("nave.wav")
     t1 = threading.Thread(target=radio, daemon=True)
     t1.start()
     prosses = starter.starter_page()
-    gra = game.game() 
+    #gra = game.game() 
         

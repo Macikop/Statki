@@ -4,9 +4,6 @@ import sys
 import threading
 import winsound
 
-def playsound():
-    system("start nave.wav")
-
 colors = {
     "PURPLE" : '\033[95m',
     "BLUE" : '\033[94m',
@@ -68,4 +65,4 @@ def lirterki(word):
 
         sys.stdout.write(returner)
         sys.stdout.flush()
-        sleep(0.1)
+        #sleep(0.1)

@@ -1,15 +1,16 @@
-from baisc import clear, display, lirterki, wait
+from baisc import clear, display, lirterki, wait, key_detect
 
 class starter_page():
     settings = {
-        "music" : True,
+        "music" : 1,
         "small_ship_num": 4,
         "mid_ship_num": 3,
         "large_ship_num" : 2,
         "huge_ship_num" : 1,
         "map_x" : 10,
         "map_y" : 10,
-        "mode" : "s",           #s - singleplayer (against computer), m - local multiplayer, o - online multiplayer,
+        "mode" : "s",               #s - singleplayer (against computer), m - local multiplayer, o - online multiplayer,
+        "auto_placement" : True,
 
     }
     
@@ -17,8 +18,8 @@ class starter_page():
         clear()
         lirterki("Statki")
         print("\n", "")
-        self.settings_handler()
-        #wait(10)
+        #self.settings_handler()
+        wait(10)
         #display("Ustawienie statków: ")
         #display("1. Automatyczne")
         #display("2. Ręczne")
@@ -50,45 +51,53 @@ class starter_page():
     def settings_save(self):
         with open("settings.txt", "w") as f:
             settings_list = list(self.settings)
-            settings_list.remove("mode")
+            settings_list.remove("mode", "auto_placement")
             for setting in settings_list:
                 f.write(setting + " = " + str(self.settings[setting]) + "\n")
 
     def settings_handler(self):
         setter = True
-        saver = False
         self.settings_load()
         settings_list = list(self.settings)
         settings_list.remove("mode")
+        settings_list.remove("auto_placement")
         for setting in settings_list:
-                print(setting + " = " + str(self.settings[setting]))
+            display(setting + " = " + str(self.settings[setting]))
         print("")
+        #wej = input()
         while setter == True:
             exit_words = ["quit", "exit", "wyjdź", "wyjście"]
-            help_words = ["help", "pomoc"]
+            help_words = ["help", "pomoc", "?"]
             wej = input()
             splited = wej.split("=")
             for l in range(len(splited)):
                 splited[l] = splited[l].strip()
             l_settings = list(self.settings)
             l_settings.remove("mode")
+            l_settings.remove("auto_placement")
             if any(ext in wej for ext in exit_words):
                 setter = False
             elif any(ext in wej for ext in help_words):
                 print("Aby zmienić ustawienie wpisz: ustawienie = wartość")
                 print("Aby zamknąć ustawienia wpisz: wyjdź")
+                settings_list =+ [[],[]]
             else:
                 if splited[0] in l_settings:
-                    if splited[0] == "music":
-                        self.settings[splited[0]] = bool(splited[1])
-                    else:
-                        self.settings[splited[0]] = int(splited[1])
+                    self.settings[splited[0]] = int(splited[1])
                 else:
                     display("Nie ma takiego parametru!", "RED")
-            print(self.settings)
-        display("Czy zapisać?")
-        display("1. Tak")
-        display("2. Nie")
-        decision = self.setting_choice(1,2)
-        if decision == 1:
-            self.settings_save()
+                    settings_list = settings_list + []
+            for setting in settings_list + [[],[],[]]:
+                print ("\033[A                             \033[A")
+            for setting in settings_list:
+                display(setting + " = " + str(self.settings[setting]))
+            print("")
+            
+        while True:
+            display("Czy zapisać? (y/n)")
+            decision = key_detect()
+            if decision == "y" or decision == "Y":
+                self.settings_save()
+                break
+            elif decision == "n" or decision == "N":
+                break

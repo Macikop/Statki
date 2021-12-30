@@ -1,18 +1,15 @@
-from baisc import clear, lirterki, wait, colors, display, playsound
+import baisc
 import starter
 import game
 import threading
 
 def radio():
     while True:
-        playsound("nave.wav")
-        playsound("escape.wav")
-
+        baisc.playsound("nave.wav")
+        baisc.playsound("escape.wav")
 
 if __name__ == '__main__':
-    #playsound("nave.wav")
     t1 = threading.Thread(target=radio, daemon=True)
     t1.start()
     prosses = starter.starter_page()
-    #gra = game.game() 
-        
+    gra = game.game() 

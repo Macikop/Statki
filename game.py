@@ -1,4 +1,4 @@
-from baisc import clear, lirterki, colors, wait, display
+from baisc import clear, display
 import random
 
 class board():
@@ -17,7 +17,7 @@ class board():
             print(n)
 
     def display_board(self, fleet):
-        water = '▒'
+        water = '▓'
         display("╔═════════════════════╗", "WHITE")
         for n in self.plansza:
             i = 0
@@ -61,20 +61,30 @@ class board():
                 for n in range(y, y+length):
                     self.plansza[n][x] = [ship_num]
 
-    def check_ships(self,x, y, dir = True, size = 1):
+    def check_ships(self,x, y, dir, size):
         tile =[]
         if dir == True:
-            for l in range(size):
-
-                tile.append(self.plansza[(y+l)][x]) 
+            for n in range(-1,2):
+                for l in range(-1, size + 1):
+                    try:
+                        tile.append(self.plansza[(y+l)][x+n])
+                    except:
+                        pass
         else:
-            for l in range(size):
-                tile.append(self.plansza[y][(x+l)])
+            for n in range(-1,2):
+                for l in range(-1, size + 1):
+                    try:
+                        tile.append(self.plansza[y+n][(x+l)])
+                    except:
+                        pass
         #print(tile)
         for n in tile:
             if n[0] != 0:
-                return True
-        return False
+                returner = True
+                return returner
+            else:
+                returner = False
+        return returner
 
 class ship():
     size = 1        #sieze:         1 - 4

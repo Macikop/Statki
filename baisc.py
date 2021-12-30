@@ -1,8 +1,8 @@
-from os import system, name
-from time import sleep
+import os
 import sys
-import threading
 import winsound
+import msvcrt
+import time
 
 colors = {
     "PURPLE" : '\033[95m',
@@ -16,26 +16,26 @@ colors = {
     "UNDERLINE" : '\033[4m'
 }
 
-def wait(time):
+def wait(time_s):
         animation = "|/-\\"
-        for i in range(time):
-            sleep(0.1)
+        for i in range(time_s):
+            time.sleep(0.1)
             sys.stdout.write("\r" + animation[i % len(animation)])
             sys.stdout.flush()
         print ("End!")
         print ("\033[A                             \033[A")
 
 def clear():
-    if name == 'nt':
-        _ = system('cls')   #windows
+    if os.name == 'nt':
+        _ = os.system('cls')   #windows
     else:
-        _ = system('clear') #linux
+        _ = os.system('clear') #linux
 
 def playsound(file):
-    if name == 'nt':
+    if os.name == 'nt':
         winsound.PlaySound(file, winsound.SND_FILENAME)
     else:
-        system("play " + file)
+        os.system("play " + file)
 
 def display(text, color = "WHITE", newline = True):
     if newline == True:
@@ -66,3 +66,31 @@ def lirterki(word):
         sys.stdout.write(returner)
         sys.stdout.flush()
         #sleep(0.1)
+
+def key_detect():
+    repeat = True
+    m = None
+    n = None
+    last_m = None
+    while repeat == True:
+        if msvcrt.kbhit():
+            ch = msvcrt.getch()
+            m = str(ch)
+            if m == "b'\\xe0'":
+                n = str(ch)
+            elif last_m != "b'\\xe0'":
+                n = None
+            if n == "b'\\xe0'" and m == "b'M'":
+                return "right"
+            elif n == "b'\\xe0'" and m == "b'P'":
+                return "down"
+            elif n == "b'\\xe0'" and m == "b'H'":
+                return "up"
+            elif n == "b'\\xe0'" and m == "b'K'":
+                return "left"
+            elif m != "b'\\xe0'" and n == None:
+                m = m[1:]
+                m = m.replace("'", "")
+                return m
+            last_m = m
+            

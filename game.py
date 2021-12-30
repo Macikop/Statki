@@ -1,4 +1,4 @@
-from baisc import clear, display
+from baisc import clear, display, key_detect
 import random
 
 class board():
@@ -18,7 +18,9 @@ class board():
 
     def display_board(self, fleet):
         water = '▓'
-        display("╔═════════════════════╗", "WHITE")
+        display("    A B C D E F G H I J", "WHITE")
+        display("  ╔══════════════════════╗", "WHITE")
+        index = 0
         for n in self.plansza:
             i = 0
             for u in n:
@@ -29,10 +31,16 @@ class board():
                 else:
                     tile = water
                 if i == 0:
-                    display("║", "WHITE" , False)
+                    index = index + 1
+                    if index < 10:
+                        num = " " + str(index)
+                    else:
+                        num = str(index)
+                    display(num + "║", "WHITE" , False)
+                    display(water, "BLUE", False)
                 #for i in range(self.size_x):
                 if tile != water:
-                    if u[0] >= 1 and u[0] <= 4:
+                    if u[0] >= 7 and u[0] <= 10:
                         display(water, "BLUE", False)
                         display("■", "YELLOW", False)
 
@@ -49,7 +57,7 @@ class board():
                     display("║")
                 i = i + 1
         #print(pla)
-        display("╚═════════════════════╝","WHITE")
+        display("  ╚══════════════════════╝","WHITE")
 
     def place_ship(self, x, y, dir, length, ship_num):
         if dir == False:
@@ -112,16 +120,17 @@ class game():
     destroyer_num = 3
     cruiser_num = 2
     battleship_num = 1
-
+    cursor_x = 3
+    cursor_y = 2
     number_of_ships = frigate_num + destroyer_num + cruiser_num + battleship_num
 
     def __init__(self):
-        #clear()
+        clear()
         self.team_a_fleet = self.create_fleet(self.number_of_ships)
         self.team_b_fleet = self.create_fleet(self.number_of_ships)
         self.plansza_a = board()
         self.random_ship_placement(self.plansza_a, self.team_a_fleet)
-        self.plansza_a.print_board()
+        #self.plansza_a.print_board()
         self.plansza_a.display_board(self.team_a_fleet)
         #self.plansza_a.print_board()
         #print("")
@@ -130,6 +139,8 @@ class game():
         #self.plansza_a.place_ship(3, 2, False, 3, 1)
         #clear()
         #self.plansza_a.print_board()
+        while True:
+            self.cursor_move()
 
     def create_fleet (self, n):
         returner = []
@@ -140,11 +151,11 @@ class game():
     def random_ship_placement(self, board_obj, fleet_obj):
         n = 0
         miss = True
-        for _ in range(self.frigate_num):
-            size = 1
+        for _ in range(self.battleship_num):
+            size = 4
             miss = True
-            direction = bool(random.getrandbits(1))
             while miss == True:
+                direction = bool(random.getrandbits(1))
                 if direction == False:
                     x = random.randrange(0, (board.size_x+1) - size)
                     y = random.randrange(0,9)
@@ -156,27 +167,11 @@ class game():
             fleet_obj[n].set_place(x, y, size, direction)
             n = n + 1
         
-        for _ in range(self.destroyer_num):
-            miss = True
-            size = 2
-            direction = bool(random.getrandbits(1))
-            while miss == True:
-                if direction == False:
-                    x = random.randrange(0, (board.size_x+1) - size)
-                    y = random.randrange(0,9)
-                else:
-                    x = random.randrange(0, 9)
-                    y = random.randrange(0, (board.size_y+1) - size)
-                miss = board_obj.check_ships(x, y, direction, size)
-            board_obj.place_ship(x, y, direction, size, n+1)
-            fleet_obj[n].set_place(x, y, size, direction)
-            n = n + 1
-
         for _ in range(self.cruiser_num):
             miss = True
             size = 3
-            direction = bool(random.getrandbits(1))
             while miss == True:
+                direction = bool(random.getrandbits(1))
                 if direction == False:
                     x = random.randrange(0, (board.size_x+1) - size)
                     y = random.randrange(0,9)
@@ -188,11 +183,11 @@ class game():
             fleet_obj[n].set_place(x, y, size, direction)
             n = n + 1
 
-        for _ in range(self.battleship_num):
+        for _ in range(self.destroyer_num):
             miss = True
-            size = 4
-            direction = bool(random.getrandbits(1))
+            size = 2
             while miss == True:
+                direction = bool(random.getrandbits(1))
                 if direction == False:
                     x = random.randrange(0, (board.size_x+1) - size)
                     y = random.randrange(0,9)
@@ -203,3 +198,42 @@ class game():
             board_obj.place_ship(x, y, direction, size, n+1)
             fleet_obj[n].set_place(x, y, size, direction)
             n = n + 1
+
+        for _ in range(self.frigate_num):
+            miss = True
+            size = 1
+            while miss == True:
+                direction = bool(random.getrandbits(1))
+                if direction == False:
+                    x = random.randrange(0, (board.size_x+1) - size)
+                    y = random.randrange(0,9)
+                else:
+                    x = random.randrange(0, 9)
+                    y = random.randrange(0, (board.size_y+1) - size)
+                miss = board_obj.check_ships(x, y, direction, size)
+            board_obj.place_ship(x, y, direction, size, n+1)
+            fleet_obj[n].set_place(x, y, size, direction)
+            n = n + 1
+    def cursor_move(self):
+        mess = "X"
+        key = key_detect()
+        if key == "right":
+            self.cursor_x = self.cursor_x + 2
+            mess = "X"
+        if key == "left":
+            self.cursor_x = self.cursor_x - 2
+            mess = "X"
+        if key == "up":
+            self.cursor_y = self.cursor_y - 1
+            mess = "X"
+        if key == "down":
+            self.cursor_y = self.cursor_y + 1
+            mess = "X"
+        if self.cursor_y < 0:
+            self.cursor_y = 0
+        if self.cursor_x < 0:
+            self.cursor_x = 0
+        print(f'\033[{self.cursor_y+1};{self.cursor_x+1}H'+mess, end='')
+
+    def print_at(x, y, message):
+        print(f'\033[{y};{x}H'+message, end='')

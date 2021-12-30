@@ -51,7 +51,8 @@ class starter_page():
     def settings_save(self):
         with open("settings.txt", "w") as f:
             settings_list = list(self.settings)
-            settings_list.remove("mode", "auto_placement")
+            settings_list.remove("mode")
+            settings_list.remove("auto_placement")
             for setting in settings_list:
                 f.write(setting + " = " + str(self.settings[setting]) + "\n")
 

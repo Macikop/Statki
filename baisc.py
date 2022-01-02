@@ -37,11 +37,21 @@ def playsound(file):
     else:
         os.system("play " + file)
 
+def print_at(x, y, message):
+    print(f'\033[{y};{x}H'+message, end='')
+
+
 def display(text, color = "WHITE", newline = True):
     if newline == True:
         print(f"{colors[color]}{text}{colors['WHITE']}")
     else:
         print(f"{colors[color]}{text}{colors['WHITE']}", end='')
+
+def display_at(x, y, message, color = "WHITE", newline = True):
+    if newline == True:
+        print(f'{colors[color]}\033[{y};{x}H'+  message + '\033[0m', end='', flush= True)
+    else: 
+        print(f'{colors[color]}\033[{y};{x}H'+  message + '\033[0m', end='', flush= True)
 
 def lirterki(word):
     word = word.upper()

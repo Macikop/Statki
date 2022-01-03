@@ -18,7 +18,7 @@ class starter_page():
         clear()
         lirterki("Statki")
         print("\n", "")
-        self.settings_handler()
+        #self.settings_handler()
         wait(10)
         #display("Ustawienie statków: ")
         #display("1. Automatyczne")

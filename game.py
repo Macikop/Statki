@@ -1,10 +1,10 @@
-from os import terminal_size
 from baisc import clear, display, key_detect, display_at
 import random
 
 class board():
     size_x = 10
     size_y = 10
+    visibility = False
     
     def __init__(self):
         self.plansza = []
@@ -17,63 +17,116 @@ class board():
         for n in self.plansza:
             print(n)
 
-    def render_board(self, fleet):
-        water = '▓'
-        pla = []
-        pla.append([["    A B C D E F G H I J", "WHITE"]])
-        pla.append([["  ╔═════════════════════╗", "WHITE"]])
-        index = 0
-        for n in self.plansza:
-            i = 0
-            line =[]
-            for u in n:
-                try:
-                    if u[0] != 0:
-                            tile = str(u[0])
-                            position = fleet[u[0]-1].dir
-                    else:
-                        tile = water
-                except:
-                    if u[0] == 'x':
-                        tile = 'x'
-                        col = "RED"
-                    else:
-                        tile = 'o'
-                        col = "PURPLE"
-                if i == 0:
-                    index = index + 1
-                    if index < 10:
-                        num = " " + str(index)
-                    else:
-                        num = str(index)
-                    line.append([num + "║", "WHITE" ])
-                    #line.append([water, "BLUE"])
-                if tile != water:
+    def render_board(self, fleet, vis):
+        self.visibility = vis
+        if self.visibility == True:
+            water = '█'
+            pla = []
+            pla.append([["    A B C D E F G H I J", "WHITE"]])
+            pla.append([["  ╔═════════════════════╗", "WHITE"]])
+            index = 0
+            for n in self.plansza:
+                i = 0
+                line =[]
+                for u in n:
                     try:
-                        if u[0] >= 7 and u[0] <= 10:
-                            line.append([water, "BLUE"])
-                            line.append(["■", "YELLOW"])
-
-                        elif position == True:
-                            line.append([water, "BLUE"])
-                            line.append(["█", "YELLOW"])
+                        if u[0] != 0:
+                                tile = str(u[0])
+                                position = fleet[u[0]-1].dir
                         else:
-                            line.append(["▬", "YELLOW"])
-                            line.append(["▬", "YELLOW"])
+                            tile = water
                     except:
+                        if u[0] == 'x':
+                            tile = 'x'
+                            col = "RED"
+                        else:
+                            tile = 'o'
+                            col = "PURPLE"
+                    if i == 0:
+                        index = index + 1
+                        if index < 10:
+                            num = " " + str(index)
+                        else:
+                            num = str(index)
+                        line.append([num + "║", "WHITE" ])
+                        #line.append([water, "BLUE"])
+                    if tile != water:
+                        try:
+                            if u[0] >= 7 and u[0] <= 10:
+                                line.append([water, "BLUE"])
+                                line.append(["■", "YELLOW"])
+
+                            elif position == True:
+                                line.append([water, "BLUE"])
+                                line.append(["█", "YELLOW"])
+                            else:
+                                line.append(["▬", "YELLOW"])
+                                line.append(["▬", "YELLOW"])
+                        except:
+                            line.append([water,"BLUE"])
+                            line.append([tile, col])
+                    else:
                         line.append([water,"BLUE"])
-                        line.append([tile, col])
-                else:
-                    line.append([water,"BLUE"])
-                    line.append([tile, "BLUE"])
-                if i == self.size_x -1:
-                    line.append([water, "BLUE"])
-                    line.append(["║", "WHITE"])
-                    pla.append(line)
-                i = i + 1
-        pla.append([["  ╚═════════════════════╝","WHITE"]])
-        #print(pla)
-        return pla
+                        line.append([tile, "BLUE"])
+                    if i == self.size_x -1:
+                        line.append([water, "BLUE"])
+                        line.append(["║", "WHITE"])
+                        pla.append(line)
+                    i = i + 1
+            pla.append([["  ╚═════════════════════╝","WHITE"]])
+            #print(pla)
+            return pla
+        else:
+            water = "█"
+            pla = []
+            pla.append([["    A B C D E F G H I J", "WHITE"]])
+            pla.append([["  ╔═════════════════════╗", "WHITE"]])
+            index = 0
+            for n in self.plansza:
+                i = 0
+                line =[]
+                for u in n:
+                    if str(type(u[0])) != "<class 'int'>": 
+                        if u[0] == 'x':
+                            tile = 'x'
+                            col = "RED"
+                        elif u[0] == 'o':
+                            tile = 'o'
+                            col = "PURPLE"
+                    else:
+                        tile = "█"
+                        water = "█"
+                    if i == 0:
+                        index = index + 1
+                        if index < 10:
+                            num = " " + str(index)
+                        else:
+                            num = str(index)
+                        line.append([num + "║", "WHITE" ])
+                        #line.append([water, "BLUE"])
+                    if tile != water:
+                        try:
+                            if u[0] >= 7 and u[0] <= 10:
+                                line.append([water, "BLUE"])
+                                line.append(["■", "YELLOW"])
+                            else:
+                                line.append(["▬", "YELLOW"])
+                                line.append(["▬", "YELLOW"])
+                        except:
+                            line.append([water,"BLUE"])
+                            line.append([tile, col])
+                    else:
+                        line.append([water,"BLUE"])
+                        line.append([tile, "BLUE"])
+                    if i == self.size_x -1:
+                        line.append([water, "BLUE"])
+                        line.append(["║", "WHITE"])
+                        pla.append(line)
+                    i = i + 1
+            pla.append([["  ╚═════════════════════╝","WHITE"]])
+            #print(pla)
+            return pla
+
 
     def place_ship(self, x, y, dir, length, ship_num):
         if dir == False:
@@ -152,30 +205,37 @@ class game():
     cursor_y = 0
     cursor_char = 'X' 
     number_of_ships = frigate_num + destroyer_num + cruiser_num + battleship_num
+    actual_player = True
 
     def __init__(self):
         clear()
+        #bot = enemy()
         self.team_a_fleet = self.create_fleet(self.number_of_ships)
         self.team_b_fleet = self.create_fleet(self.number_of_ships)
         self.plansza_a = board()
         self.random_ship_placement(self.plansza_a, self.team_a_fleet)
-        #self.plansza_a.print_board()
-        #self.plansza_a.print_board()
-        #print("")
-        #self.plansza_b = board()
-        #self.plansza_b.print_board()
+        self.plansza_b = board()
+        self.random_ship_placement(self.plansza_b, self.team_b_fleet)
         #self.plansza_a.place_ship(3, 2, False, 3, 1)
-        #clear()
-        #self.plansza_a.print_board()
-        render = self.plansza_a.render_board(self.team_a_fleet)
-        end = True
+        render_a = self.plansza_a.render_board(self.team_a_fleet, True)
+        render_b = self.plansza_b.render_board(self.team_b_fleet, False)
         #wind = window()
-        #self.display_board_from_render(wind.write())
+        end = True
         while end == True:
-            self.display_board_from_render(render)
-            render = self.plansza_a.render_board(self.team_a_fleet)
-            self.cursor_move(render)
-            end = self.plansza_a.check_end()
+            self.display_board_from_render(render_a, 0, 0)
+            self.display_board_from_render(render_b, 40, 0)
+            render_a = self.plansza_a.render_board(self.team_a_fleet, True)
+            render_b = self.plansza_b.render_board(self.team_b_fleet, False)
+            if self.actual_player == True:
+                #self.cursor_move(render_a)
+                #bot.easy_bot(self.plansza_a, self.team_a_fleet)
+                self.easy_bot(self.plansza_a)
+            else:
+                self.cursor_move(render_b)
+            end_a = self.plansza_a.check_end()
+            end_b = self.plansza_b.check_end()
+            if end_a == False or end_b == False:
+                end = False
             
 
     def create_fleet (self, n):
@@ -275,33 +335,95 @@ class game():
 
         if key == " ":
             self.cursor_char = "O"
-            self.shoot(self.cursor_x, self.cursor_y, self.plansza_a, self.team_a_fleet)
+            if self.actual_player == True:
+                self.shoot(self.cursor_x, self.cursor_y, self.plansza_a, self.team_a_fleet)
+            else:
+                self.shoot(self.cursor_x, self.cursor_y, self.plansza_b, self.team_b_fleet)
+            if self.actual_player == True:
+                self.actual_player = False
+                self.cursor_x = 0 
+                self.cursor_y = 0
+            else:
+                self.actual_player = True
+                self.cursor_x = 0
+                self.cursor_y = 0
+
             #self.apply_mask_to_render(render, 'X', "RED", self.cursor_x + self.cursor_x_offset, self.cursor_y + self.cursor_y_offset)
+        #if key == "r":
+        #    if self.actual_player == True:
+        #        self.actual_player = False
+        #    else:
+        #        self.actual_player = True
         
-    def display_board_from_render(self, render):
+    def display_board_from_render(self, render, x, y):
         #clear()
-        y = 0
-        x = 0
+        a_y = y
+        a_x = x
         for line in render:
-            x = 0
+            a_x = x
             for word in line:
                 if word != line[-1]:
-                    display_at(x + 1, y+1, word[0], word[1], False)
+                    display_at(a_x + 1, a_y+1, word[0], word[1], False)
                 else:
-                    display_at(x + 1, y+1, word[0], word[1], True)
-                x = x + len(word[0]) 
-            y = y + 1
+                    display_at(a_x + 1, a_y+1, word[0], word[1], True)
+                a_x = a_x + len(word[0]) 
+            a_y = a_y + 1
 
     def apply_mask_to_render(self, render, mod, color, x, y):
         render[y][x][0] = mod
         render[y][x][1] = color       
             
-    def shoot(self, x, y, board_obj, fleet):
+    def shoot(self, x, y, board_obj, fleet = None):
         i = board_obj.plansza[y][int(x/2)]
         if  i != [0] and i != ['o']:
             board_obj.plansza[y][int(x/2)] = ['x']
         if i == [0]:
             board_obj.plansza[y][int(x/2)] = ['o']
+
+    known_board = []
+    past_moves = []
+
+    def easy_bot(self, enemy_board):
+        repeat = False
+        while repeat == False:
+            x = random.randint(0, board.size_x-1)
+            y = random.randint(0, board.size_y-1)
+            if [x, y] in self.past_moves:
+                repeat = False
+            else:
+                repeat = True
+                self.past_moves.append([x, y])
+                i = enemy_board.plansza[y][int(x)]
+                if  i != [0] and i != ['o']:
+                    enemy_board.plansza[y][int(x)] = ['x']
+                if i == [0]:
+                    enemy_board.plansza[y][int(x)] = ['o']
+        if self.actual_player == True:
+                self.actual_player = False
+                self.cursor_x = 0 
+                self.cursor_y = 0
+        else:
+            self.actual_player = True
+            self.cursor_x = 0
+            self.cursor_y = 0
+
+
+
+#class enemy():
+#    
+#    known_board = []
+#    past_moves = []
+#
+#    def easy_bot(self, enemy_board, enemy_fleet):
+#        repeat = False
+#        while repeat == False:
+#            x = random.randint(0, board.size_x-1)
+#            y = random.randint(0, board.size_y-1)
+#            if [x, y] in self.past_moves:
+#                repeat = False
+#            else:
+#                self.past_moves.append([x, y])
+#                game.shoot(x, y, enemy_board, enemy_fleet)
 
 #class window():
 #    size_x = 10

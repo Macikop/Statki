@@ -18,7 +18,7 @@ class starter_page():
         clear()
         lirterki("Statki")
         print("\n", "")
-        #self.settings_handler()
+        self.settings_handler()
         wait(10)
         #display("Ustawienie statków: ")
         #display("1. Automatyczne")
@@ -81,10 +81,12 @@ class starter_page():
             elif any(ext in wej for ext in help_words):
                 print("Aby zmienić ustawienie wpisz: ustawienie = wartość")
                 print("Aby zamknąć ustawienia wpisz: wyjdź")
-                settings_list =+ [[],[]]
+                settings_list = settings_list + [[],[]]
             else:
                 if splited[0] in l_settings:
                     self.settings[splited[0]] = int(splited[1])
+                    print("")
+                    #settings_list = settings_list + [[], []]
                 else:
                     display("Nie ma takiego parametru!", "RED")
                     settings_list = settings_list + []

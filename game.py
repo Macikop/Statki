@@ -1,3 +1,4 @@
+from os import terminal_size
 from baisc import clear, display, key_detect, display_at
 import random
 
@@ -108,6 +109,16 @@ class board():
             else:
                 returner = False
         return returner
+    
+    def check_end(self):
+        returner = True
+        for line in self.plansza:
+            for word in line:
+                if word == [0] or word == ['x'] or word == ['o']:
+                    returner = False
+                else:
+                    return True
+        return returner
 
 class ship():
     size = 1        #sieze:         1 - 4
@@ -157,10 +168,14 @@ class game():
         #clear()
         #self.plansza_a.print_board()
         render = self.plansza_a.render_board(self.team_a_fleet)
-        while True:
+        end = True
+        #wind = window()
+        #self.display_board_from_render(wind.write())
+        while end == True:
             self.display_board_from_render(render)
             render = self.plansza_a.render_board(self.team_a_fleet)
             self.cursor_move(render)
+            end = self.plansza_a.check_end()
             
 
     def create_fleet (self, n):
@@ -287,3 +302,29 @@ class game():
             board_obj.plansza[y][int(x/2)] = ['x']
         if i == [0]:
             board_obj.plansza[y][int(x/2)] = ['o']
+
+#class window():
+#    size_x = 10
+#    size_y = 10
+#    win =[]
+#    
+#    def write(self):
+#        for y in range(self.size_y):
+#            for x in  range(self.size_x):
+#                if y == 0:
+#                    if x == 0:
+#                        self.win.append(["╔", "WHITE"])
+#                    elif x == self.size_x - 1:
+#                        self.win.append(["╗", "WHITE"])
+#                    else:
+#                        self.win.append(["═", "WHITE"])
+#                elif y == self.size_y - 1:
+#                    if x == 0:
+#                        self.win.append(["╔", "WHITE"])
+#                    elif x == self.size_x - 1:
+#                        self.win.append(["╗", "WHITE"])
+#                    else:
+#                        self.win.append(["═", "WHITE"])
+#                else:
+#                    self.win.append(["║", "WHITE"])
+#        return self.win

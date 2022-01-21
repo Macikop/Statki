@@ -11,7 +11,7 @@ def radio():
 
 if __name__ == '__main__':
     t1 = threading.Thread(target=radio, daemon=True)
-    #t1.start()
+    t1.start()
     prosses = starter.starter_page()
     gra = game.game()
     end = ender.ender_page()

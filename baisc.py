@@ -1,8 +1,12 @@
 import os
 import sys
-import winsound
-import msvcrt
 import time
+if os.name == 'nt':
+    import winsound
+    import msvcrt      
+else:
+    import termios
+    import tty
 
 colors = {
     "PURPLE" : '\033[95m',
@@ -35,7 +39,7 @@ def playsound(file):
     if os.name == 'nt':
         winsound.PlaySound(file, winsound.SND_FILENAME)
     else:
-        os.system("play " + file)
+        os.system("aplay " + os.path.join(sys.path[0],file))
 
 def print_at(x, y, message):
     print(f'\033[{y};{x}H'+message, end='')
@@ -55,7 +59,7 @@ def display_at(x, y, message, color = "WHITE", newline = True):
 
 def lirterki(word):
     word = word.upper()
-    with open("Literki.txt") as file:
+    with open(os.path.join(sys.path[0], "Literki.txt")) as file:
         big_letters = file.read()
         big_letters = big_letters.split('%')
         napis = []
@@ -78,29 +82,62 @@ def lirterki(word):
         #sleep(0.1)
 
 def key_detect():
-    repeat = True
-    m = None
-    n = None
-    last_m = None
-    while repeat == True:
-        if msvcrt.kbhit():
-            ch = msvcrt.getch()
-            m = str(ch)
-            if m == "b'\\xe0'":
-                n = str(ch)
-            elif last_m != "b'\\xe0'":
-                n = None
-            if n == "b'\\xe0'" and m == "b'M'":
-                return "right"
-            elif n == "b'\\xe0'" and m == "b'P'":
-                return "down"
-            elif n == "b'\\xe0'" and m == "b'H'":
-                return "up"
-            elif n == "b'\\xe0'" and m == "b'K'":
-                return "left"
-            elif m != "b'\\xe0'" and n == None:
-                m = m[1:]
-                m = m.replace("'", "")
-                return m
-            last_m = m
+    if os.name == 'nt':
+        repeat = True
+        m = None
+        n = None
+        last_m = None
+        while repeat == True:
+            if msvcrt.kbhit():
+                ch = msvcrt.getch()
+                m = str(ch)
+                if m == "b'\\xe0'":
+                    n = str(ch)
+                elif last_m != "b'\\xe0'":
+                    n = None
+                if n == "b'\\xe0'" and m == "b'M'":
+                    return "right"
+                elif n == "b'\\xe0'" and m == "b'P'":
+                    return "down"
+                elif n == "b'\\xe0'" and m == "b'H'":
+                    return "up"
+                elif n == "b'\\xe0'" and m == "b'K'":
+                    return "left"
+                elif m != "b'\\xe0'" and n == None:
+                    m = m[1:]
+                    m = m.replace("'", "")
+                    return m
+                last_m = m
+    else:
+        orig_settings = termios.tcgetattr(sys.stdin)
+    tty.setcbreak(sys.stdin)
+    x = 0
+    m = 1
+    n = 1
+    returner = ''
+    while True:
+        x=sys.stdin.read(1)[0]
+        if x == chr(27):
+            m = x
+        elif m == chr(27):
+            n = x
+            if n == "[":
+                x=sys.stdin.read(1)[0]
+                if x == 'A':
+                    returner = "up"
+                elif x == 'B':
+                    returner = "down"
+                elif x == 'C':
+                    returner = "right"
+                elif x == 'D':
+                    returner = "left"
+                n = 0
+            m = 0
+            x = 0
+        else:
+            returner = x
+        if returner != '':
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, orig_settings)
+            return returner
+        
             

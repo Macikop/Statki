@@ -1,17 +1,18 @@
 import baisc
 import ender
-import starter
+import starter    
 import game
-import threading
+import multiprocessing
 
 def radio():
     while True:
-        baisc.playsound("nave.wav")
         baisc.playsound("escape.wav")
+        baisc.playsound("nave.wav")
+
 
 if __name__ == '__main__':
-    t1 = threading.Thread(target=radio, daemon=True)
-    #t1.start()
+    t1 = multiprocessing.Process(target=radio, daemon= True)
+    t1.start()
     prosses = starter.starter_page()
     gra = game.game()
     wygrana = gra.start()

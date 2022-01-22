@@ -1,4 +1,3 @@
-from dotenv import set_key
 from baisc import clear, display, key_detect, display_at, wait
 import random
 

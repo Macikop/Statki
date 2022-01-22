@@ -79,7 +79,7 @@ def lirterki(word):
 
         sys.stdout.write(returner)
         sys.stdout.flush()
-        #sleep(0.1)
+
 
 def key_detect():
     if os.name == 'nt':
@@ -140,4 +140,10 @@ def key_detect():
                 termios.tcsetattr(sys.stdin, termios.TCSADRAIN, orig_settings)
                 return returner
             
-            
+def print_image(file_name):
+    with open(os.path.join(sys.path[0], file_name)) as file:
+        lines = file.readlines()
+        for n in lines:
+            for chars in n:
+                print(chars, end='')
+    print("\n")

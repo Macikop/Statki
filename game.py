@@ -1,17 +1,24 @@
 from baisc import clear, display, key_detect, display_at, wait
 import random
+import time
 
 class board():
     size_x = 10
     size_y = 10
     visibility = False
-    
+    cursor_limit_x = 2*size_x-2
+    cursor_limit_y = size_y-1
+
     def __init__(self):
         self.plansza = []
         for x in range(self.size_y):
             self.plansza.append([])
             for y in range(self.size_x):
                 self.plansza[x].append([0])
+
+    def restore_cursor_limit(self):
+        self.cursor_limit_x = 2*board.size_x-2
+        self.cursor_limit_y = board.size_y-1
 
     def print_board(self):
         for n in self.plansza:
@@ -223,42 +230,100 @@ class game():
         self.cursor_y = 0
         self.cursor_char = 'X' 
 
-    def start(self):
+    def start(self, settings):
         clear()
         bot = enemy()
         self.team_a_fleet = self.create_fleet(self.number_of_ships)
         self.team_b_fleet = self.create_fleet(self.number_of_ships)
         self.plansza_a = board()
-        self.random_ship_placement(self.plansza_a, self.team_a_fleet)
         self.plansza_b = board()
-        self.random_ship_placement(self.plansza_b, self.team_b_fleet)
-        render_a = self.plansza_a.render_board(self.team_a_fleet, True)
-        render_b = self.plansza_b.render_board(self.team_b_fleet, False)
-        #render_ship_a = self.render_fleet_status(self.team_a_fleet)
-        #render_ship_b = self.render_fleet_status(self.team_b_fleet)
-        #wind = window()
-        #wait(100)
+        self.place = settings["auto_placement"]
+        if self.place == True:
+            self.random_ship_placement(self.plansza_a, self.team_a_fleet)
+            self.random_ship_placement(self.plansza_b, self.team_b_fleet)
+        else:
+            if settings["mode"] == 2:
+                self.actual_player = True
+                if self.actual_player == True:
+                    self.manual_ship_placement(self.plansza_a, self.team_a_fleet)
+                    self.actual_player = False
+                if self.actual_player == False:
+                    self.manual_ship_placement(self.plansza_b, self.team_b_fleet)
+                self.place = True
+            else:
+                self.actual_player = True
+                if self.actual_player == True:
+                    self.manual_ship_placement(self.plansza_a, self.team_a_fleet)
+                    self.actual_player = False
+                self.random_ship_placement(self.plansza_b, self.team_b_fleet)
+                self.place = True
+        clear()
+        if settings["mode"] == 1:
+            render_a = self.plansza_a.render_board(self.team_a_fleet, True)
+            render_b = self.plansza_b.render_board(self.team_b_fleet, False)
+        elif settings["mode"] == 2:
+            display_at(0, 1, "Gracz 1")
+            display_at(0, 2, "Naciśnij ENTER")
+            key_detect()
+            render_a = self.plansza_a.render_board(self.team_a_fleet, True)
+            render_b = self.plansza_b.render_board(self.team_b_fleet, False)
+        self.actual_player = False
+        last_player = False
         end = True
         while end == True:
+            if settings["mode"] == 2:
+                if last_player == True and self.actual_player == False:
+                    render_a = self.plansza_a.render_board(self.team_a_fleet, False)
+                    render_b = self.plansza_b.render_board(self.team_b_fleet, True)
+                    self.scr.display_board_from_render(render_a, 0, 0)
+                    self.scr.display_board_from_render(render_b, 40, 0)
+                    render_a = self.plansza_a.render_board(self.team_a_fleet, True)
+                    render_b = self.plansza_b.render_board(self.team_b_fleet, False)
+                    time.sleep(1)
+                    clear()
+                    display_at(0, 1, "Gracz 1")
+                    display_at(0, 2, "Naciśnij ENTER")
+                    key_detect()
+                elif last_player == False and self.actual_player == True:
+                    render_a = self.plansza_a.render_board(self.team_a_fleet, True)
+                    render_b = self.plansza_b.render_board(self.team_b_fleet, False)
+                    self.scr.display_board_from_render(render_a, 0, 0)
+                    self.scr.display_board_from_render(render_b, 40, 0)
+                    render_a = self.plansza_a.render_board(self.team_a_fleet, False)
+                    render_b = self.plansza_b.render_board(self.team_b_fleet, True)
+                    time.sleep(1)
+                    clear()
+                    display_at(0, 1, "Gracz 2")
+                    display_at(0, 2, "Naciśnij ENTER")
+                    key_detect()
             self.scr.display_board_from_render(render_a, 0, 0)
             self.scr.display_board_from_render(render_b, 40, 0)
-            #self.scr.display_board_from_render(render_ship_a, 40, 0)
-            #self.scr.display_board_from_render(render_ship_b, 120, 0)
-            render_a = self.plansza_a.render_board(self.team_a_fleet, True)
-            render_b = self.plansza_b.render_board(self.team_b_fleet, True)
-            #render_ship_a = self.render_fleet_status(self.team_a_fleet)
-            #render_ship_b = self.render_fleet_status(self.team_b_fleet)
-            if self.actual_player == True:
-                #self.cursor_move(render_a)
-                bot.easy_bot(self.plansza_a)
-                self.change_player()
-            else:
-                self.cursor_move(render_b)
-                #self.change_player()
+            if settings["mode"] == 1:
+                render_a = self.plansza_a.render_board(self.team_a_fleet, True)
+                render_b = self.plansza_b.render_board(self.team_b_fleet, False)
+                if self.actual_player == True:
+                    bot.easy_bot(self.plansza_a)
+                    self.change_player()
+                else:
+                    self.cursor_move(render_b, self.plansza_b)
+            elif settings["mode"] == 2:
+                if self.actual_player == True:
+                    render_a = self.plansza_a.render_board(self.team_a_fleet, False)
+                    render_b = self.plansza_b.render_board(self.team_b_fleet, True)
+                else:
+                    render_a = self.plansza_a.render_board(self.team_a_fleet, True)
+                    render_b = self.plansza_b.render_board(self.team_b_fleet, False)
+                if self.actual_player == True:
+                    self.cursor_move(render_a, self.plansza_a)
+                    last_player = True
+                else:
+                    self.cursor_move(render_b, self.plansza_b)
+                    last_player = False
             end_a = self.plansza_a.check_end()
             end_b = self.plansza_b.check_end()
             if end_a == False or end_b == False:
                 end = False
+        del self.scr
         if end_a == False:
             return False
         else:
@@ -269,6 +334,127 @@ class game():
         for _ in range(n):
             returner.append(ship())
         return returner
+
+    def manual_ship_placement(self, board_obj, fleet_obj):
+        n = 0
+        miss = True
+        direction = True
+        render = board_obj.render_board(fleet_obj, True)
+        for _ in range(self.battleship_num):
+            self.scr.display_board_from_render(render, 0, 0)
+            render = board_obj.render_board(fleet_obj, True)
+            size = 4
+            miss = True
+            board_obj.restore_cursor_limit()
+            board_obj.cursor_limit_y = board_obj.cursor_limit_y - (size-1)
+            while miss == True:
+                self.scr.display_board_from_render(render, 0, 0)
+                render = board_obj.render_board(fleet_obj, True)
+                cursor_response = self.cursor_move(render, board_obj)
+                if str(type(cursor_response)) == "<class 'list'>" :
+                    if cursor_response != ["dir_change"]:
+                        x = int(cursor_response[0]/2)
+                        y = cursor_response[1]
+                        miss = board_obj.check_ships(x, y, direction, size)
+                    else:
+                        if direction == True:
+                            direction = False
+                            board_obj.restore_cursor_limit()
+                            board_obj.cursor_limit_x = board_obj.cursor_limit_x - ((2*size)-2)
+                        else:
+                            direction = True
+                            board_obj.restore_cursor_limit()
+                            board_obj.cursor_limit_y = board_obj.cursor_limit_y - (size-1)
+            board_obj.place_ship(x, y, direction, size, n+1)
+            fleet_obj[n].set_place(x, y, size, direction)
+            n = n + 1
+
+        for _ in range(self.cruiser_num):
+            self.scr.display_board_from_render(render, 0, 0)
+            render = board_obj.render_board(fleet_obj, True)
+            size = 3
+            miss = True
+            board_obj.restore_cursor_limit()
+            board_obj.cursor_limit_y = board_obj.cursor_limit_y - (size-1)
+            while miss == True:
+                self.scr.display_board_from_render(render, 0, 0)
+                render = board_obj.render_board(fleet_obj, True)
+                cursor_response = self.cursor_move(render, board_obj)
+                if str(type(cursor_response)) == "<class 'list'>" :
+                    if cursor_response != ["dir_change"]:
+                        x = int(cursor_response[0]/2)
+                        y = cursor_response[1]
+                        miss = board_obj.check_ships(x, y, direction, size)
+                    else:
+                        if direction == True:
+                            direction = False
+                            board_obj.restore_cursor_limit()
+                            board_obj.cursor_limit_x = board_obj.cursor_limit_x - (2*size-2)
+                        else:
+                            direction = True
+                            board_obj.restore_cursor_limit()
+                            board_obj.cursor_limit_y = board_obj.cursor_limit_y - (size-1)
+            board_obj.place_ship(x, y, direction, size, n+1)
+            fleet_obj[n].set_place(x, y, size, direction)
+            n = n + 1
+
+        for _ in range(self.destroyer_num):
+            self.scr.display_board_from_render(render, 0, 0)
+            render = board_obj.render_board(fleet_obj, True)
+            size = 2
+            miss = True
+            board_obj.restore_cursor_limit()
+            board_obj.cursor_limit_y = board_obj.cursor_limit_y - (size-1)
+            while miss == True:
+                self.scr.display_board_from_render(render, 0, 0)
+                render = board_obj.render_board(fleet_obj, True)
+                cursor_response = self.cursor_move(render, board_obj)
+                if str(type(cursor_response)) == "<class 'list'>" :
+                    if cursor_response != ["dir_change"]:
+                        x = int(cursor_response[0]/2)
+                        y = cursor_response[1]
+                        miss = board_obj.check_ships(x, y, direction, size)
+                    else:
+                        if direction == True:
+                            direction = False
+                            board_obj.restore_cursor_limit()
+                            board_obj.cursor_limit_x = board_obj.cursor_limit_x - (2*size-2)
+                        else:
+                            direction = True
+                            board_obj.restore_cursor_limit()
+                            board_obj.cursor_limit_y = board_obj.cursor_limit_y - (size-1)
+            board_obj.place_ship(x, y, direction, size, n+1)
+            fleet_obj[n].set_place(x, y, size, direction)
+            n = n + 1
+
+        for _ in range(self.frigate_num):
+            self.scr.display_board_from_render(render, 0, 0)
+            render = board_obj.render_board(fleet_obj, True)
+            size = 1
+            miss = True
+            board_obj.restore_cursor_limit()
+            board_obj.cursor_limit_y = board_obj.cursor_limit_y - (size-1)
+            while miss == True:
+                self.scr.display_board_from_render(render, 0, 0)
+                render = board_obj.render_board(fleet_obj, True)
+                cursor_response = self.cursor_move(render, board_obj)
+                if str(type(cursor_response)) == "<class 'list'>" :
+                    if cursor_response != ["dir_change"]:
+                        x = int(cursor_response[0]/2)
+                        y = cursor_response[1]
+                        miss = board_obj.check_ships(x, y, direction, size)
+                    else:
+                        if direction == True:
+                            direction = False
+                            board_obj.restore_cursor_limit()
+                            board_obj.cursor_limit_x = board_obj.cursor_limit_x - (2*size-2)
+                        else:
+                            direction = True
+                            board_obj.restore_cursor_limit()
+                            board_obj.cursor_limit_y = board_obj.cursor_limit_y - (size-1)
+            board_obj.place_ship(x, y, direction, size, n+1)
+            fleet_obj[n].set_place(x, y, size, direction)
+            n = n + 1
 
     def random_ship_placement(self, board_obj, fleet_obj):
         n = 0
@@ -338,8 +524,17 @@ class game():
             n = n + 1
 
     
-    def cursor_move(self, render):
+    def cursor_move(self, render, board_obj):
         #print(f'\033[{self.cursor_y_offset + self.cursor_y+1};{self.cursor_x_offset + self.cursor_x+1}H'+ self.cursor_char + f'\033[;{-1}H', end='')
+        if self.cursor_y < 0:
+            self.cursor_y = 0
+        if self.cursor_x < 0:
+            self.cursor_x = 0
+        if self.cursor_y > board_obj.cursor_limit_y:
+            self.cursor_y = board_obj.cursor_limit_y
+        if self.cursor_x > board_obj.cursor_limit_x:
+            self.cursor_x = board_obj.cursor_limit_x
+
         self.cursor_char = "X"
         key = key_detect()
         if key == "right":
@@ -355,19 +550,26 @@ class game():
             self.cursor_y = 0
         if self.cursor_x < 0:
             self.cursor_x = 0
-        if self.cursor_y > board.size_y-1:
-            self.cursor_y = board.size_y-1
-        if self.cursor_x > 2*board.size_x-2:
-            self.cursor_x = 2*board.size_x-2
+        if self.cursor_y > board_obj.cursor_limit_y:
+            self.cursor_y = board_obj.cursor_limit_y
+        if self.cursor_x > board_obj.cursor_limit_x:
+            self.cursor_x = board_obj.cursor_limit_x
+        #if self.place == True:
         self.scr.apply_mask_to_render(render, 'X', "WHITE", self.cursor_x + self.cursor_x_offset, self.cursor_y + self.cursor_y_offset)
 
         if key == " ":
-            self.cursor_char = "O"
-            if self.actual_player == True:
-                self.shoot(self.cursor_x, self.cursor_y, self.plansza_a, self.team_a_fleet)
+            if self.place == True:
+                self.cursor_char = "O"
+                if self.actual_player == True:
+                    self.shoot(self.cursor_x, self.cursor_y, self.plansza_a, self.team_a_fleet)
+                else:
+                    self.shoot(self.cursor_x, self.cursor_y, self.plansza_b, self.team_b_fleet)
+                self.change_player()
             else:
-                self.shoot(self.cursor_x, self.cursor_y, self.plansza_b, self.team_b_fleet)
-            self.change_player()
+                return [self.cursor_x, self.cursor_y]
+        if key == "r" or key == "R":
+            if self.place == False:
+                return ["dir_change"]
 
     def shoot(self, x, y, board_obj, fleet):
         i = board_obj.plansza[y][int(x/2)]
@@ -454,6 +656,9 @@ class screen():
     def apply_mask_to_render(self, render, mod, color, x, y):
         render[y][x][0] = mod
         render[y][x][1] = color
+
+    def __del__ (self):
+        clear()
 
 #class window():
 #    size_x = 10

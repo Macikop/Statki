@@ -15,4 +15,5 @@ if __name__ == '__main__':
     prosses = starter.starter_page()
     gra = game.game()
     wygrana = gra.start()
+    t1.terminate()
     end = ender.ender_page(wygrana)

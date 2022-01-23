@@ -79,7 +79,7 @@ def lirterki(word):
 
         sys.stdout.write(returner)
         sys.stdout.flush()
-        #sleep(0.1)
+
 
 def key_detect():
     if os.name == 'nt':

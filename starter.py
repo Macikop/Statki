@@ -7,12 +7,6 @@ class starter_page():
         "music" : 1,
         "mode" : 1,               #1 - singleplayer (against computer), 2 - local multiplayer, 3 - online multiplayer,
         "auto_placement" : True,
-        #"small_ship_num": 4,
-        #"mid_ship_num": 3,
-        #"large_ship_num" : 2,
-        #"huge_ship_num" : 1,
-        #"map_x" : 10,
-        #"map_y" : 10,
     }
     
     def __init__(self):
@@ -24,17 +18,6 @@ class starter_page():
         self.radio = multiprocessing.Process(target=self.play_music, daemon= True)
         if self.settings["music"] != 0:
             self.radio.start()
-        #self.settings_handler()
-        #self.initial_questions()
-        #wait(10)
-        #display("Ustawienie statków: ")
-        #display("1. Automatyczne")
-        #display("2. Ręczne")
-        #ship_placement = self.setting_choice(1,2)
-        #display("Ustawienia?")
-        #display("1. Tak, poproszę")
-        #display("2. Nie, dziękuje")
-        #settings = self.setting_choice(1,2)
 
     def initial_questions(self):
         onec_again = True
@@ -56,7 +39,7 @@ class starter_page():
             self.settings['auto_placement'] = True
         last_music = self.settings['music']
         display("Ustawienia: ")
-        #self.settinger()
+        self.settinger()
         if last_music == 0:
             if self.settings["music"] == 1:
                 self.radio.start()
@@ -77,10 +60,6 @@ class starter_page():
         settings_list = list(self.settings)
         settings_list.remove("mode")
         settings_list.remove("auto_placement")
-        #for setting in settings_list:
-        #    display(setting + " = " + str(self.settings[setting]))
-        #print("")
-        #wej = input()
         while setter == True:
             exit_words = ["quit", "exit", "wyjdź", "wyjście"]
             help_words = ["help", "pomoc", "?"]
@@ -100,26 +79,14 @@ class starter_page():
                 print("Aby zmienić ustawienie wpisz: *ustawienie* = *wartość*")
                 print("Aby zamknąć ustawienia wpisz: wyjdź")
                 print("Ustawienia zadziałają dopiero po zapisaniu")
-                #print(self.settings)
-                #settings_list = settings_list + [[],[]]
-                #input()
             else:
                 if splited[0] in settings_list:
                     try:
                         self.settings[splited[0]] = int(splited[1])
                     except:
                         display("Niepoprawna wartość", color="RED")
-                    #print("")
-                    #settings_list = settings_list + [[], []]
                 else:
                     display("Nie ma takiego parametru!", "RED")
-                    #settings_list = settings_list + []
-                    #input()
-            #for setting in settings_list + [[],[],[]]:
-            #    print ("\033[A                             \033[A")
-            #for setting in settings_list:
-                #display(setting + " = " + str(self.settings[setting]))
-            #print("")
             
         while True:
             display("Czy zapisać? (y/n)")

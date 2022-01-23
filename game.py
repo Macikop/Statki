@@ -1,3 +1,4 @@
+from tkinter.tix import Tree
 from baisc import clear, display, key_detect, display_at, wait
 import random
 import time
@@ -242,13 +243,21 @@ class game():
             self.random_ship_placement(self.plansza_a, self.team_a_fleet)
             self.random_ship_placement(self.plansza_b, self.team_b_fleet)
         else:
-            self.actual_player = True
-            if self.actual_player == True:
-                self.manual_ship_placement(self.plansza_a, self.team_a_fleet)
-                self.actual_player = False
-            if self.actual_player == False:
-                self.manual_ship_placement(self.plansza_b, self.team_b_fleet)
-            self.place = True
+            if settings["mode"] == 2:
+                self.actual_player = True
+                if self.actual_player == True:
+                    self.manual_ship_placement(self.plansza_a, self.team_a_fleet)
+                    self.actual_player = False
+                if self.actual_player == False:
+                    self.manual_ship_placement(self.plansza_b, self.team_b_fleet)
+                self.place = True
+            else:
+                self.actual_player = True
+                if self.actual_player == True:
+                    self.manual_ship_placement(self.plansza_a, self.team_a_fleet)
+                    self.actual_player = False
+                self.random_ship_placement(self.plansza_b, self.team_b_fleet)
+                self.place = True
         clear()
         if settings["mode"] == 1:
             render_a = self.plansza_a.render_board(self.team_a_fleet, True)
@@ -291,8 +300,8 @@ class game():
             self.scr.display_board_from_render(render_a, 0, 0)
             self.scr.display_board_from_render(render_b, 40, 0)
             if settings["mode"] == 1:
-                render_a = self.plansza_a.render_board(self.team_a_fleet, False)
-                render_b = self.plansza_b.render_board(self.team_b_fleet, True)
+                render_a = self.plansza_a.render_board(self.team_a_fleet, True)
+                render_b = self.plansza_b.render_board(self.team_b_fleet, False)
                 if self.actual_player == True:
                     bot.easy_bot(self.plansza_a)
                     self.change_player()

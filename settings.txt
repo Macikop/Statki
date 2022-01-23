@@ -1,7 +1,1 @@
 music = 1
-small_ship_num = 4
-mid_ship_num = 3
-large_ship_num = 2
-huge_ship_num = 1
-map_x = 10
-map_y = 10

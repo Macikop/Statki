@@ -7,8 +7,10 @@ class ender_page():
         #lirterki("Koniec")
         #print("\n")
         if wygrana == True:
+            print("Gracz 1")
             lirterki("Wygrales")
         else:
+            print("Gracz 2")
             lirterki("Przegrales")
         if os.name != 'nt':
             for x in range(2):

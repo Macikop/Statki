@@ -147,3 +147,53 @@ def print_image(file_name):
             for chars in n:
                 print(chars, end='')
     print("\n")
+
+class screen():
+    def display_board_from_render(self, render, x, y):
+        #clear()
+        a_y = y
+        a_x = x
+        for line in render:
+            a_x = x
+            for word in line:
+                if word != line[-1]:
+                    display_at(a_x + 1, a_y+1, word[0], word[1], False)
+                else:
+                    display_at(a_x + 1, a_y+1, word[0], word[1], True)
+                a_x = a_x + len(word[0]) 
+            a_y = a_y + 1
+             
+    def render_fleet_status(self, fleet):
+        pla = []
+        size_x = 6
+        size_y = 10
+        ship_num = 0
+        pla.append([["╔══════╗", "WHITE"]])
+        for y in range(size_y):
+            line = []
+            for x in range(size_x):
+                if y % 2 == 0:
+                    if x == 0 or x == size_x - 1:
+                        line.append(["║", "WHITE"])
+                    else:
+                        line.append([" ", "WHITE"])
+                else:
+                    if x == 0 or x == size_x - 1:
+                        line.append(["║", "WHITE"])
+                    else:
+                        for part in range(fleet[ship_num].size):
+                            if fleet[ship_num].damage[part] == True:
+                                line.append(["x", "RED"])
+                            else: 
+                                line.append(["▬", "YELLOW"])
+                        #ship_num = ship_num + 1
+            pla.append(line)
+        pla.append([["╔══════╗", "WHITE"]])
+        return pla
+    
+    def apply_mask_to_render(self, render, mod, color, x, y):
+        render[y][x][0] = mod
+        render[y][x][1] = color
+
+    def __del__ (self):
+        clear()

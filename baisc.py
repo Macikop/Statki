@@ -42,11 +42,6 @@ def playsound(file):
     else:
         os.system("aplay " + os.path.join(sys.path[0],file))
 
-def multi_playsound(file, n):
-    n = threading.Thread(target=playsound, args=(file))
-    return n
-
-
 def print_at(x, y, message):
     print(f'\033[{y};{x}H'+message, end='')
 

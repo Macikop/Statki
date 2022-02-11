@@ -1,6 +1,8 @@
-from baisc import clear, display, key_detect, display_at, multi_playsound, playsound, wait, screen
+from re import T
+from baisc import clear, display, key_detect, display_at, playsound, wait, screen
 import random
 import time
+import multiprocessing
 
 class board():
     size_x = 10
@@ -192,6 +194,7 @@ class ship():
         self.damage = []
 
     def set_place(self, x, y, size, direction):
+        self.sound = None
         self.dir = direction
         self.damage = []
         self.size = size
@@ -207,13 +210,22 @@ class ship():
             self.damage.append(False)
 
     def damage_ship(self, destroyed_part):
+
         self.damage[destroyed_part] = True
         damage = True
         for n in self.damage:
             if n == False:
                 damage = False
         if damage == True:
-            self.status = False
+            self.sound = None
+            #self.status = False
+            self.sound = None
+            self.sound = multiprocessing.Process(target= self.multisound, args=("sounds/Shipsink.wav",), daemon= True)
+            self.sound.start()
+
+    def multisound(self, sound):
+        time.sleep(1)
+        playsound(sound)
 
 class game():
 
@@ -547,6 +559,13 @@ class cursor():
     def __init__(self, place):
         self.place = place
 
+    def multi_sound(self, sound):
+        playsound(sound)
+
+    def slow_multi_sound(self, sound):
+        time.sleep(0.5)
+        playsound(sound)
+
     def cursor_move(self, screen, render, board_obj, fleet_obj = None, size = 1, dir = True):
         if self.cursor_y < 0:
             self.cursor_y = 0
@@ -604,15 +623,25 @@ class cursor():
 
     def shoot(self, x, y, board_obj, fleet):
         #playsound("sounds/Catapult.wav")
-        multi_playsound("sounds/Catapult.wav")
+        self.shoot_sound = multiprocessing.Process(target=self.multi_sound, args=("sounds/Catapult.wav",), daemon= True)
+        self.hit_sound = multiprocessing.Process(target=self.slow_multi_sound, args=("sounds/Explode.wav",), daemon= True)
+        self.miss_sound = multiprocessing.Process(target=self.slow_multi_sound, args=("sounds/Oilplat.wav",), daemon= True)
+        self.shoot_sound.start()
         i = board_obj.plansza[y][int(x/2)]
         if  i != [0] and i != ['o'] and i != ['x']:
             board_obj.plansza[y][int(x/2)] = ['x']
             fleet[i[0]-1].damage_ship(i[1])
             #playsound("sounds/Explode.wav")
+            self.shoot_sound = None
+            self.hit_sound.start()
         if i == [0]:
             board_obj.plansza[y][int(x/2)] = ['o']
             #playsound("sounds/Oilplat.wav")
+            self.shoot_sound = None
+            self.miss_sound.start()
+
+        self.hit_sound = None
+        self.miss_sound = None
 
     def next_player(self):
         return self.shooted

@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import threading
 if os.name == 'nt':
     import winsound
     import msvcrt      
@@ -16,9 +17,9 @@ colors = {
     "YELLOW" : '\033[93m',
     "RED" : '\033[91m',
     "WHITE" : '\033[0m',
-    "BOLD" : '\033[1m',
-    "UNDERLINE" : '\033[4m'
 }
+
+lirterki_dict = {}
 
 def wait(time_s):
         animation = "|/-\\"
@@ -40,6 +41,11 @@ def playsound(file):
         winsound.PlaySound(file, winsound.SND_FILENAME)
     else:
         os.system("aplay " + os.path.join(sys.path[0],file))
+
+def multi_playsound(file, n):
+    n = threading.Thread(target=playsound, args=(file))
+    return n
+
 
 def print_at(x, y, message):
     print(f'\033[{y};{x}H'+message, end='')
@@ -80,6 +86,54 @@ def lirterki(word):
         sys.stdout.write(returner)
         sys.stdout.flush()
 
+def load_lirterki_new():
+    global lirterki_dict
+    lirterki_dict.clear()
+    #word = word.upper()
+    with open(os.path.join(sys.path[0], "More_literki.txt"),encoding="utf-8") as file:
+        file_content = file.readlines()
+        header = file_content[0].split("█")
+
+        letters = file_content[2:]
+
+        for index, line in enumerate(letters):
+            letters[index] = line.split('%')
+
+        for index, char in enumerate(header):
+            letter = []
+            for line in letters:
+                letter.append(line[index])
+
+            lirterki_dict.update({char : letter })
+
+load_lirterki_new()
+
+def lirterki_render(word, color = "WHITE"):
+    global lirterki_dict
+    global colors
+    render = [[],[],[],[],[],[],[],[],[]]
+    word = word.upper()
+    if color != "RAINBOW":
+        for letter in word:
+            big_letter = lirterki_dict[letter]
+            for i, line in enumerate(render):
+                render[i].append([big_letter[i], color])
+    else:
+        key = list(colors.keys())
+        key_len = len(key)
+        tup = []
+        for i, letter in enumerate(word,):
+            if i < key_len:
+                i = i
+            else:
+                i = i - (int(i/key_len)*key_len)
+            tup.append([letter, key[i]])
+        for letter in tup:
+                big_letter = lirterki_dict[letter[0]]
+                for i, line in enumerate(render):
+                    render[i].append([big_letter[i], letter[1]])
+
+    return render
 
 def key_detect():
     if os.name == 'nt':
@@ -147,6 +201,18 @@ def print_image(file_name):
             for chars in n:
                 print(chars, end='')
     print("\n")
+
+def image_to_render(file_name, color):
+    render = []
+    with open(os.path.join(sys.path[0], file_name)) as file:
+        lines = file.readlines()
+        for line in lines:
+            render_line = []
+            for char in line:
+                render_line.append([char, color])
+            render.append(render_line)
+    return render
+                
 
 class screen():
     def display_board_from_render(self, render, x, y):

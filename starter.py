@@ -1,5 +1,4 @@
-from timeit import repeat
-from baisc import clear, display, lirterki, wait, key_detect, print_image, playsound
+from baisc import clear, display, lirterki, lirterki_render, wait, key_detect, print_image, playsound, screen, image_to_render
 import multiprocessing
 
 class starter_page():
@@ -11,9 +10,13 @@ class starter_page():
     
     def __init__(self):
         clear()
-        lirterki("Statki")
+        self.scr = screen()
+        self.scr.display_board_from_render(lirterki_render("Statki", "RAINBOW"), 1, 5)
+        #lirterki("Statki")
+        #print("\n", "")
+        self.scr.display_board_from_render(image_to_render("Statek.txt", "WHITE"), 70, 1)
         print("\n", "")
-        print_image("Statek.txt")
+        #print_image("Statek.txt")
         self.settings_load()
         self.radio = multiprocessing.Process(target=self.play_music, daemon= True)
         if self.settings["music"] != 0:

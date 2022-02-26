@@ -8,4 +8,4 @@ if __name__ == '__main__':
     gra = game.game()
     wygrana = gra.start(setting)
     del first_page
-    end = ender.ender_page(wygrana)
+    end = ender.ender_page(wygrana, setting)

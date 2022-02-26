@@ -16,7 +16,22 @@ colors = {
     "GREEN" : '\033[92m',
     "YELLOW" : '\033[93m',
     "RED" : '\033[91m',
+    "WHITE" : '\033[97m',
+}
+
+more_colors = {
+    "PURPLE" : '\033[95m',
+    "BLUE" : '\033[94m',
+    "CYAN" : '\033[96m',
+    "GREEN" : '\033[92m',
+    "YELLOW" : '\033[93m',
+    "RED" : '\033[91m',
     "WHITE" : '\033[0m',
+    "YELLOW_ON_BLUE" : '\033[93;104m',
+    "PURPLE_ON_BLUE" : '\033[95;104m',
+    "RED_ON_BLUE" : '\033[91;104m',
+    "WHITE_ON_BLUE" : '\033[97;104m'
+
 }
 
 lirterki_dict = {}
@@ -40,7 +55,7 @@ def playsound(file):
     if os.name == 'nt':
         winsound.PlaySound(file, winsound.SND_FILENAME)
     else:
-        os.system("aplay " + os.path.join(sys.path[0],file))
+        os.system("aplay " + os.path.join(sys.path[0],file + " > /dev/null 2>&1 &"))
 
 def print_at(x, y, message):
     print(f'\033[{y};{x}H'+message, end='')
@@ -48,15 +63,15 @@ def print_at(x, y, message):
 
 def display(text, color = "WHITE", newline = True):
     if newline == True:
-        print(f"{colors[color]}{text}{colors['WHITE']}")
+        print(f"{more_colors[color]}{text}\033[0m")
     else:
-        print(f"{colors[color]}{text}{colors['WHITE']}", end='')
+        print(f"{more_colors[color]}{text}\033[0m", end='')
 
 def display_at(x, y, message, color = "WHITE", newline = True):
     if newline == True:
-        print(f'{colors[color]}\033[{y};{x}H'+  message + '\033[0m', end='', flush= True)
+        print(f'{more_colors[color]}\033[{y};{x}H'+  message + '\033[0m', end='', flush= True)
     else: 
-        print(f'{colors[color]}\033[{y};{x}H'+  message + '\033[0m', end='', flush= True)
+        print(f'{more_colors[color]}\033[{y};{x}H'+  message + '\033[0m', end='', flush= True)
 
 def lirterki(word):
     word = word.upper()
@@ -223,34 +238,6 @@ class screen():
                     display_at(a_x + 1, a_y+1, word[0], word[1], True)
                 a_x = a_x + len(word[0]) 
             a_y = a_y + 1
-             
-    def render_fleet_status(self, fleet):
-        pla = []
-        size_x = 6
-        size_y = 10
-        ship_num = 0
-        pla.append([["╔══════╗", "WHITE"]])
-        for y in range(size_y):
-            line = []
-            for x in range(size_x):
-                if y % 2 == 0:
-                    if x == 0 or x == size_x - 1:
-                        line.append(["║", "WHITE"])
-                    else:
-                        line.append([" ", "WHITE"])
-                else:
-                    if x == 0 or x == size_x - 1:
-                        line.append(["║", "WHITE"])
-                    else:
-                        for part in range(fleet[ship_num].size):
-                            if fleet[ship_num].damage[part] == True:
-                                line.append(["x", "RED"])
-                            else: 
-                                line.append(["▬", "YELLOW"])
-                        #ship_num = ship_num + 1
-            pla.append(line)
-        pla.append([["╔══════╗", "WHITE"]])
-        return pla
     
     def apply_mask_to_render(self, render, mod, color, x, y):
         render[y][x][0] = mod

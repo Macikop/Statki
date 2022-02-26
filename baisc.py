@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import threading
 if os.name == 'nt':
     import winsound
     import msvcrt      
@@ -15,10 +16,25 @@ colors = {
     "GREEN" : '\033[92m',
     "YELLOW" : '\033[93m',
     "RED" : '\033[91m',
-    "WHITE" : '\033[0m',
-    "BOLD" : '\033[1m',
-    "UNDERLINE" : '\033[4m'
+    "WHITE" : '\033[97m',
 }
+
+more_colors = {
+    "PURPLE" : '\033[95m',
+    "BLUE" : '\033[94m',
+    "CYAN" : '\033[96m',
+    "GREEN" : '\033[92m',
+    "YELLOW" : '\033[93m',
+    "RED" : '\033[91m',
+    "WHITE" : '\033[0m',
+    "YELLOW_ON_BLUE" : '\033[93;104m',
+    "PURPLE_ON_BLUE" : '\033[95;104m',
+    "RED_ON_BLUE" : '\033[91;104m',
+    "WHITE_ON_BLUE" : '\033[97;104m'
+
+}
+
+lirterki_dict = {}
 
 def wait(time_s):
         animation = "|/-\\"
@@ -39,7 +55,7 @@ def playsound(file):
     if os.name == 'nt':
         winsound.PlaySound(file, winsound.SND_FILENAME)
     else:
-        os.system("aplay " + os.path.join(sys.path[0],file))
+        os.system("aplay " + os.path.join(sys.path[0],file)+ " > /dev/null 2>&1 &")
 
 def print_at(x, y, message):
     print(f'\033[{y};{x}H'+message, end='')
@@ -47,15 +63,15 @@ def print_at(x, y, message):
 
 def display(text, color = "WHITE", newline = True):
     if newline == True:
-        print(f"{colors[color]}{text}{colors['WHITE']}")
+        print(f"{more_colors[color]}{text}\033[0m")
     else:
-        print(f"{colors[color]}{text}{colors['WHITE']}", end='')
+        print(f"{more_colors[color]}{text}\033[0m", end='')
 
 def display_at(x, y, message, color = "WHITE", newline = True):
     if newline == True:
-        print(f'{colors[color]}\033[{y};{x}H'+  message + '\033[0m', end='', flush= True)
+        print(f'{more_colors[color]}\033[{y};{x}H'+  message + '\033[0m', end='', flush= True)
     else: 
-        print(f'{colors[color]}\033[{y};{x}H'+  message + '\033[0m', end='', flush= True)
+        print(f'{more_colors[color]}\033[{y};{x}H'+  message + '\033[0m', end='', flush= True)
 
 def lirterki(word):
     word = word.upper()
@@ -80,6 +96,54 @@ def lirterki(word):
         sys.stdout.write(returner)
         sys.stdout.flush()
 
+def load_lirterki_new():
+    global lirterki_dict
+    lirterki_dict.clear()
+    #word = word.upper()
+    with open(os.path.join(sys.path[0], "More_literki.txt"),encoding="utf-8") as file:
+        file_content = file.readlines()
+        header = file_content[0].split("█")
+
+        letters = file_content[2:]
+
+        for index, line in enumerate(letters):
+            letters[index] = line.split('%')
+
+        for index, char in enumerate(header):
+            letter = []
+            for line in letters:
+                letter.append(line[index])
+
+            lirterki_dict.update({char : letter })
+
+load_lirterki_new()
+
+def lirterki_render(word, color = "WHITE"):
+    global lirterki_dict
+    global colors
+    render = [[],[],[],[],[],[],[],[],[]]
+    word = word.upper()
+    if color != "RAINBOW":
+        for letter in word:
+            big_letter = lirterki_dict[letter]
+            for i, line in enumerate(render):
+                render[i].append([big_letter[i], color])
+    else:
+        key = list(colors.keys())
+        key_len = len(key)
+        tup = []
+        for i, letter in enumerate(word,):
+            if i < key_len:
+                i = i
+            else:
+                i = i - (int(i/key_len)*key_len)
+            tup.append([letter, key[i]])
+        for letter in tup:
+                big_letter = lirterki_dict[letter[0]]
+                for i, line in enumerate(render):
+                    render[i].append([big_letter[i], letter[1]])
+
+    return render
 
 def key_detect():
     if os.name == 'nt':
@@ -147,3 +211,37 @@ def print_image(file_name):
             for chars in n:
                 print(chars, end='')
     print("\n")
+
+def image_to_render(file_name, color):
+    render = []
+    with open(os.path.join(sys.path[0], file_name)) as file:
+        lines = file.readlines()
+        for line in lines:
+            render_line = []
+            for char in line:
+                render_line.append([char, color])
+            render.append(render_line)
+    return render
+                
+
+class screen():
+    def display_board_from_render(self, render, x, y):
+        #clear()
+        a_y = y
+        a_x = x
+        for line in render:
+            a_x = x
+            for word in line:
+                if word != line[-1]:
+                    display_at(a_x + 1, a_y+1, word[0], word[1], False)
+                else:
+                    display_at(a_x + 1, a_y+1, word[0], word[1], True)
+                a_x = a_x + len(word[0]) 
+            a_y = a_y + 1
+    
+    def apply_mask_to_render(self, render, mod, color, x, y):
+        render[y][x][0] = mod
+        render[y][x][1] = color
+
+    def __del__ (self):
+        clear()

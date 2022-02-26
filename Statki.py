@@ -1,6 +1,6 @@
-import ender
 import starter
 import game
+import ender
 
 if __name__ == '__main__':
     first_page = starter.starter_page()
@@ -8,4 +8,4 @@ if __name__ == '__main__':
     gra = game.game()
     wygrana = gra.start(setting)
     del first_page
-    end = ender.ender_page(wygrana)
+    end = ender.ender_page(wygrana, setting)

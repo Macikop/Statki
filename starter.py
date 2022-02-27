@@ -1,6 +1,8 @@
 from baisc import clear, display, lirterki, lirterki_render, wait, key_detect, print_image, playsound, screen, image_to_render
 import multiprocessing
 import network
+import os
+import sys
 
 class starter_page():
     settings = {
@@ -145,14 +147,14 @@ class starter_page():
                 print("Możesz wpisywać tylko liczby całkowite z przedziału", min, "do", max)
 
     def settings_load(self):
-        with open("settings.txt", "r") as f:
+        with open(os.path.join(sys.path[0],"settings.txt"), "r", encoding= "utf-8") as f:
             lines = f.readlines()
             for l in lines:
                 n = l.split("=")
                 self.settings[n[0].strip()] = int(n[1].strip())
 
     def settings_save(self):
-        with open("settings.txt", "w") as f:
+        with open(os.path.join(sys.path[0],"settings.txt"), "w", encoding= "utf-8") as f:
             settings_list = list(self.settings)
             settings_list.remove("mode")
             settings_list.remove("auto_placement")

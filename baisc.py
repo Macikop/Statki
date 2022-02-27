@@ -1,7 +1,6 @@
 import os
 import sys
 import time
-import threading
 if os.name == 'nt':
     import winsound
     import msvcrt      
@@ -55,7 +54,7 @@ def playsound(file):
     if os.name == 'nt':
         winsound.PlaySound(file, winsound.SND_FILENAME)
     else:
-        os.system("aplay " + os.path.join(sys.path[0],file + " > /dev/null 2>&1 &"))
+        os.system("aplay " + os.path.join(sys.path[0],file)+ " > /dev/null 2>&1")
 
 def print_at(x, y, message):
     print(f'\033[{y};{x}H'+message, end='')

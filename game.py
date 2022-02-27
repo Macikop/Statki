@@ -304,6 +304,8 @@ class game():
                     self.actual_player = False
                 self.place = True
         clear()
+        display_at(70, 10, "strzałki - przesuwanie statku")
+        display_at(70, 11, "spacja - strzał")
         if settings["mode"] == 1:
             render_a = self.plansza_a.render_board(self.team_a_fleet, True)
             render_b = self.plansza_b.render_board(self.team_b_fleet, False)
@@ -473,6 +475,9 @@ class game():
         miss = True
         direction = True
         render = board_obj.render_board(fleet_obj, True)
+        display_at(40, 5, "strzałki - przesuwanie statku")
+        display_at(40, 6, "r - obrót statku")
+        display_at(40, 7, "spacja - zatwierdzenie pozycji statku")
         for _ in range(self.battleship_num):
             self.scr.display_board_from_render(render, 0, 0)
             render = board_obj.render_board(fleet_obj, True)

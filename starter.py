@@ -48,8 +48,22 @@ class starter_page():
         else:
             self.settings['auto_placement'] = True
         last_music = self.settings['music']
-        display("Ustawienia: ")
-        self.settinger()
+        display("Czy chcesz włączyć ustawienia?")
+        display("1. Tak     2. Nie")
+        ustawienia = int(self.setting_choice(max=2))
+        if ustawienia == 1:
+            display("Ustawienia: ")
+            display("Dostępne ustawienia:")
+            settings_list = list(self.settings)
+            settings_list.remove("mode")
+            settings_list.remove("auto_placement")
+            settings_list.remove("server_ip")
+            for setting in settings_list:
+                display(setting + " = " + str(self.settings[setting]))
+            display("Aby zmienić ustawienie wpisz: *ustawienie* = *wartość*")
+            display("Aby zamknąć ustawienia wpisz: wyjdź")
+            display("Ustawienia zadziałają dopiero po zapisaniu")
+            self.settinger()
         if last_music == 0:
             if self.settings["music"] == 1:
                 self.radio.start()

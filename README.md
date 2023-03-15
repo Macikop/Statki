@@ -16,7 +16,7 @@ python3 Statki.py
 
 ## Rozgrywka On-line
 
-Aby grać z innym graczem w tyrybie on-line należy:
+Aby grać z innym graczem w trybie on-line należy:
 
 - uruchomić plik: server.py
 - uruchomić grę i wybrać tryb on-line
